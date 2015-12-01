@@ -21,7 +21,7 @@ app.get('/hello', function (req, res) {
 });
 
 
-//Exercise 1
+//Exercise 1: getting started
 app.use(function(req, res, next) {
     req.accountId = 1;
     console.log(req.accountId);
@@ -29,7 +29,9 @@ app.use(function(req, res, next) {
 });
 
 
-//Exercise 2
+
+
+//Exercise 2: listing some addressbooks
 app.get('/AddressBook', function(req, res) {
     
     connection.query('select * from AddressBook where AddressBook.accountId =' + req.accountId, function(err, rows) {
@@ -42,12 +44,42 @@ app.get('/AddressBook', function(req, res) {
     });
 });
 
-//Exercise 3
+
+
+
+
+//Exercise 3: listing a specific addressbook
+app.get('/AddressBook/:id', function(req,res) {
+    
+    connection.query('select * from AddressBook where AddressBook.accountId =' + Number(req.params.id), function(err,rows) {
+        rows.forEach(function(addressbook) {
+              if (addressbook.accountId !== req.accountId) {
+            console.log('Error was detected');
+            res.status(400).send('Access Denied');
+        }
+        else {
+            res.json(rows);
+        }
+            
+        })
+    
+    })
+    
+})
+
+
+//Exercise 4: creating a new addressbook
+app.post('/AddressBook/', function(res, req) {
+    console.log(req.body);
+})
+
+
 
 
 app.listen(process.env.PORT, function(){
-    console.log("SKYNET IS ONLINE!")
+    console.log("Skynet!")
 });
+
 
 //Exercise 3
 
