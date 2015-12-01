@@ -69,8 +69,30 @@ app.get('/AddressBook/:id', function(req,res) {
 
 
 //Exercise 4: creating a new addressbook
-app.post('/AddressBook/', function(res, req) {
-    console.log(req.body);
+app.post('/AddressBook/', function(req, res) {
+    if (req.body.name) {
+        connection.query("insert into AddressBook (accountId, name) values (" +  req.accountId + ",'" + req.body.name +"')", function (err,rows){
+           
+        console.log(rows);
+        connection.query('select * from AddressBook where AddressBook.id=' + rows.insertId, function(err, res) {
+            console.log(res);
+        }
+
+        );
+        
+        
+        
+        })
+        
+    
+        res.end();
+    }  
+    else {
+         res.status(400).send('Access Denied');
+    }
+    
+    
+  
 })
 
 
@@ -81,6 +103,6 @@ app.listen(process.env.PORT, function(){
 });
 
 
-//Exercise 3
+
 
 
