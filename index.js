@@ -32,7 +32,7 @@ app.use(function(req, res, next) {
 
 
 //Exercise 2: listing some addressbooks
-app.get('/AddressBook', function(req, res) {
+app.get('/addressbook', function(req, res) {
     
     connection.query('select * from AddressBook where AddressBook.accountId =' + req.accountId, function(err, rows) {
         if (err) {
@@ -49,27 +49,27 @@ app.get('/AddressBook', function(req, res) {
 
 
 //Exercise 3: listing a specific addressbook
-app.get('/AddressBook/:id', function(req,res) {
+// app.get('/AddressBook/:id', function(req,res) {
     
-    connection.query('select * from AddressBook where AddressBook.accountId =' + Number(req.params.id), function(err,rows) {
-        rows.forEach(function(addressbook) {
-              if (addressbook.accountId !== req.accountId) {
-            console.log('Error was detected');
-            res.status(400).send('Access Denied');
-        }
-        else {
-            res.json(rows);
-        }
+//     connection.query('select * from AddressBook where AddressBook.accountId =' + Number(req.params.id), function(err,rows) {
+//         rows.forEach(function(addressbook) {
+//               if (addressbook.accountId !== req.accountId) {
+//             console.log('Error was detected');
+//             res.status(400).send('Access Denied');
+//         }
+//         else {
+//             res.json(rows);
+//         }
             
-        })
+//         })
     
-    })
+//     })
     
-})
+// })
 
 
 //Exercise 4: creating a new addressbook
-app.post('/AddressBook', function(req, res) {
+app.post('/addressbook', function(req, res) {
     if (req.body.name) {
         connection.query("insert into AddressBook (accountId, name) values (" +  req.accountId + ",'" + req.body.name +"')", function (err,rows){
            
@@ -215,25 +215,12 @@ app.delete('/entry/:addressBookId/:id', function(req, res) {
     res.end();
 });
 
-app.put('/entry/:addressBookId/:id', function(req, res) {
-     connection.query("select Entry.id, Entry.firstName, Entry.lastName, Entry.birthday from Entry join AddressBook on AddressBook.id = Entry.addressbookId join Account on Account.id = AddressBook.accountId where AddressBook.id =" + req.params.addressBookId + " and Account.id = " + req.accountId + " and Entry.id =" + req.params.id, function(err, rows) {
-         if (err) {
-             res.status(404).send("Access denied");
-         }
-         
-         if (rows) {
-             connection.query("update Entry set name ="' + req.body.firstName + '" ' +' where id=' + req.params.id)
-         }
-         
-         res.end();
-     })
-}
-
-
 
 
 //req.body is the JSON objects specified in the API client form, if they are defined we run the instructions following the if
 //statement
+
+//Exercise 8
 
 
 

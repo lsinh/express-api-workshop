@@ -79,15 +79,25 @@ var Entry = conn.define('Entry', {
 },{
     tableName: 'Entry'})
 
-Account.find({
-    include: [{
-        model: AddressBook,
-        include: [Entry]
-    }]
-}).then(function(result) {
-    console.log(result);
-})
+AddressBook.hasMany(Entry, {foreignKey: 'addressbookId'});
 
+
+Account.find({
+    include: [
+        {
+            model: AddressBook,
+            include: [Entry]
+        }
+    ],
+    where: {
+        id: 1
+    },
+    exclude: ['password']
+}).then(function(result) {
+    console.log(JSON.stringify(result, "\t"));
+}).catch(function(err) {
+    console.log(err);
+});
 
 
 
