@@ -12,6 +12,9 @@ var sequelize = require('sequelize');
 //this is where we initialize the sequelize connection using the database, username and if necessary password
 var conn = new sequelize('addressbook', 'lsinh');
 
+//This is the dependency that will encrypt passwords (i.e. hash them)
+var bcrypt = require('bcrypt-nodejs');
+
 
 //Where we setup the Account table within the addressbook database, sequelize will tend to pluralize table 
 //names so make sure to redefine it in a different object
@@ -567,40 +570,103 @@ app.use(function(req, res, next) {
 // });
 
 
-app.put('/phone/:addressbookId/:entryId/:phoneId', function(req, res) {
-    Phone.findOne({
-      include: 
-        [{model: Entry, 
-            where: {id: req.params.entryId},
-            include:
-        [{model: AddressBook,
-            where: {id: req.params.addressbookId},
-            include:
-            [{model: Account,
-                where: {id: req.accountId}
-            }]
-        }] 
-        }],
-        where: {id: req.params.phoneId}}).then(function(row) {
-        if(row) {
-            console.log('fuck you!' + '\n' + row);
-            res.json(row);
+// app.put('/phone/:addressbookId/:entryId/:phoneId', function(req, res) {
+//     Phone.findOne({
+//       include: 
+//         [{model: Entry, 
+//             where: {id: req.params.entryId},
+//             include:
+//         [{model: AddressBook,
+//             where: {id: req.params.addressbookId},
+//             include:
+//             [{model: Account,
+//                 where: {id: req.accountId}
+//             }]
+//         }] 
+//         }],
+//         where: {id: req.params.phoneId}}).then(function(row) {
+//         if(row) {
+//             console.log('fuck you!' + '\n' + row);
+//             res.json(row);
             
-          Phone.update({
-                type: req.body.type,
-                subtype: req.body.subtype,
-                phoneNumber: req.body.phoneNumber
-            }, {where: {id: req.params.phoneId}
+//           Phone.update({
+//                 type: req.body.type,
+//                 subtype: req.body.subtype,
+//                 phoneNumber: req.body.phoneNumber
+//             }, {where: {id: req.params.phoneId}
                 
-            }).then(function(row) {
-                res.send('Updated the Entry');
-            });
-        } else {
-            res.send('Cannot Update Address!');
-        }
+//             }).then(function(row) {
+//                 res.send('Updated the Entry');
+//             });
+//         } else {
+//             res.send('Cannot Update Address!');
+//         }
         
-    });
+//     });
+// });
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+
+//Exercise 9: adding user signup
+
+
+//we installed bcrypt-nodejs (npm install bcrypt-nodejs) to encrypt passwords and saved
+//it in the json package (npm install bcrypt-nodejs --save)
+//must also require it
+
+//also we altered the email column to ensure we do not receive duplicate emails
+//i.e. mysql> ALTER TABLE Account ADD UNIQUE KEY unique_emails(email);
+
+// if you're not sure if you're dealing with objects or arrays, console.log it
+// Account.findAll().then(function(row) {
+        // row.forEach(function(row) {
+        //console.log(row);
+
+app.post('/Accounts/signup', function(req,res) {
+  var hash = bcrypt.hashSync(req.body.password);
+  
+    Account.findAll().then(function(row) {
+        row.forEach(function(row) {
+            if (row.email === req.body.email)
+        {
+            res.status(400).send('cannot add duplicate email!'
+            )}
+      else {
+      Account.create({
+      email: req.body.email,
+      password: hash
+        }).then(function(row){
+            console.log(row.password);
+            res.json('id: ' +row.id + ' \nemail: ' + row.email);
+        });
+          
+      }}
+      )}
+      );
+    
 });
+
+
+//Exercise 10: Adding User Login
+
+app.post('/Accounts/login', function(req,res) {
+   var salt = bcrypt.genSaltSync(10);
+   var token = bcrypt.hashSync(req.body.password, salt, null);
+   Tokens.create({
+       token: token,
+       accountId: req.accountId
+   }).then(function(row) {
+       
+   })
+   
+})    
+
+    
+
+
+
 
 
 

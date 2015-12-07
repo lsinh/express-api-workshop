@@ -1,103 +1,23 @@
-//require sequelize library
-var sequelize = require('sequelize');
+var bcrypt = require('bcrypt-nodejs');
 
+// synchronous:
+var hash = bcrypt.hashSync("bacon");
+ 
+console.log(bcrypt.compareSync("bacon", hash)); // true
+bcrypt.compareSync("veggies", hash); // false
 
-//create connection with sequelize with database
-var conn = new sequelize('addressbook', 'lsinh');
+var hash = bcrypt.hashSync("bacon");
 
-//describe fields in Account
-//sequelize will assume there is a createdAt and modifiedAT and ID field
-//sequelize also assumes everything is pluralized so make sure to spell out table_name
+console.log(hash);
 
-var Account= conn.define('Account', {
-    email: sequelize.STRING,
-    password: sequelize.STRING
-    
-}, {
-    tableName: 'Account'
+// asynchronous
+bcrypt.hash("bacon", null, null, function(err, hash) {
+    console.log(hash);
 });
 
+var pass = bcrypt.genSaltSync(10);
 
+//using it with hashsync
+var crypt = bcrypt.hashSync('yoyo', pass, null);
 
-//let's make some basic queries
-
-//find account by its ID
-//There is still a callback passed after .then
-
-// Account.findById(1).then(function(result) {
-//     console.log('I found that account, the email is: ' +result.email);
-// });
-
-//you can also JSON stirngify it to just get relevant results but can't you use these results
-
-
-//
-
-
-var AddressBook = conn.define('AddressBook', {
-    name: sequelize.STRING
-}, {
-    tableName: 'AddressBook'
-})
-
-// AddressBook.findById(1).then(function(result) {
-//     console.log(result);
-// })
-
-//you can add createdAT --> alter table AddressBook add colume createdAt DATETIME;
-
-// Account.find({
-//     where: {
-//         email: {like: 'john' },
-//     }
-// }).then(function(result) {
-//     console.log(result);
-// })
-
-
-Account.hasMany(AddressBook, {foreignKey: 'accountId'});
-
-
-// Account.find({
-//     include: [AddressBook]
-    
-// }).then(function(result) {
-//     console.log(result);
-// }).catch(function(err) {
-//     console.log(err);
-// });
-
-
-
-//you can add updatedAt
-
-
-var Entry = conn.define('Entry', {
-    firstName: sequelize.STRING,
-    lastName: sequelize.STRING,
-    birthday: sequelize.DATE
-},{
-    tableName: 'Entry'})
-
-AddressBook.hasMany(Entry, {foreignKey: 'addressbookId'});
-
-
-Account.find({
-    include: [
-        {
-            model: AddressBook,
-            include: [Entry]
-        }
-    ],
-    where: {
-        id: 1
-    },
-    exclude: ['password']
-}).then(function(result) {
-    console.log(JSON.stringify(result, "\t"));
-}).catch(function(err) {
-    console.log(err);
-});
-
-
-
+console.log(crypt);
